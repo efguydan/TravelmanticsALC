@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,11 +18,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 
 import static android.text.TextUtils.isEmpty;
 import static com.efedaniel.travelmanticsalc.FirebaseUtil.isAdmin;
@@ -33,42 +35,46 @@ public class DealActivity extends AppCompatActivity {
 
     private static final int PICTURE_RESULT = 563;
 
-    private EditText titleEditText;
-    private EditText priceEditText;
-    private EditText descriptionEditText;
-    private ImageView dealImageView;
-    private Button button;
+    @BindView(R.id.title) TextInputEditText titleEditText;
+    @BindView(R.id.price) TextInputEditText priceEditText;
+    @BindView(R.id.description) TextInputEditText descriptionEditText;
+    @BindView(R.id.image) ImageView dealImageView;
+    @BindView(R.id.btnImage) Button uploadButton;
 
+    private Unbinder unbinder;
     private TravelDeal mDeal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deal);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        unbinder = ButterKnife.bind(this);
         TravelDeal deal = (TravelDeal) getIntent().getSerializableExtra("deal_extra");
         mDeal = deal == null ? new TravelDeal() : deal;
-        initializeTextViews();
-        dealImageView = findViewById(R.id.image);
-        button = findViewById(R.id.btnImage);
-        if (!isAdmin) {
-            button.setVisibility(View.GONE);
-        }
-        button.setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/jpeg");
-            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-            startActivityForResult(intent.createChooser(intent, "Insert Picture"), PICTURE_RESULT);
-        });
-        showImage(mDeal.getImageUrl());
+        if (!isAdmin) uploadButton.setVisibility(View.GONE);
+        initializeDeal();
     }
 
-    private void initializeTextViews() {
-        titleEditText = findViewById(R.id.title);
-        priceEditText = findViewById(R.id.price);
-        descriptionEditText = findViewById(R.id.description);
+    private void initializeDeal() {
         titleEditText.setText(mDeal.getTitle());
         priceEditText.setText(mDeal.getPrice());
         descriptionEditText.setText(mDeal.getDescription());
+        showImage(mDeal.getImageUrl());
+    }
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
+    }
+
+    @OnClick(R.id.btnImage)
+    public void onuploadImageClicked() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/jpeg");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        startActivityForResult(intent.createChooser(intent, "Insert Picture"), PICTURE_RESULT);
     }
 
     @Override
@@ -103,12 +109,12 @@ public class DealActivity extends AppCompatActivity {
             case R.id.save_menu:
                 saveDeal();
                 Toast.makeText(this, "Deal saved", Toast.LENGTH_LONG).show();
-                backToList();
+                finish();
                 return true;
             case R.id.delete_menu:
                 deleteDeal();
                 Toast.makeText(this, "Deal Deleted", Toast.LENGTH_LONG).show();
-                backToList();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -140,8 +146,6 @@ public class DealActivity extends AppCompatActivity {
         } else {
             mDatabaseReference.child(mDeal.getId()).setValue(mDeal);
         }
-
-        cleanEditTexts(titleEditText, priceEditText, descriptionEditText);
     }
 
     private void deleteDeal() {
@@ -157,14 +161,9 @@ public class DealActivity extends AppCompatActivity {
         }
     }
 
-    private void backToList() {
-        Intent intent = new Intent(this, ListActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void cleanEditTexts(EditText... editTexts) {
-        for (EditText editText : editTexts) editText.setText("");
-        titleEditText.requestFocus();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 }

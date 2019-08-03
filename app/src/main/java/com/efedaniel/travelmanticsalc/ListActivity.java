@@ -13,16 +13,22 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 import static com.efedaniel.travelmanticsalc.FirebaseUtil.isAdmin;
 
 public class ListActivity extends AppCompatActivity {
 
-    private RecyclerView dealsRecyclerView;
+    @BindView(R.id.deals) RecyclerView dealsRecyclerView;
+    private Unbinder unbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        unbinder = ButterKnife.bind(this);
     }
 
     @Override
@@ -65,7 +71,6 @@ public class ListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         FirebaseUtil.openFirebaseReference("traveldeals", this);
-        dealsRecyclerView = findViewById(R.id.deals);
         DealAdapter dealAdapter = new DealAdapter();
         dealsRecyclerView.setAdapter(dealAdapter);
         dealsRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -75,5 +80,11 @@ public class ListActivity extends AppCompatActivity {
 
     public void showMenu() {
         invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 }

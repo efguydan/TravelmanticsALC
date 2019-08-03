@@ -6,23 +6,27 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/travelmantis_logo_normal_copy"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/travelmantis_logo_normal_copy"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListActivity"
-            android:screenOrientation="portrait">
+        <activity android:name=".SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DealActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
+        <activity
+            android:name=".ListActivity"
+            android:label="@string/travel_deals"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DealActivity"
+            android:label="@string/travel_deals"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

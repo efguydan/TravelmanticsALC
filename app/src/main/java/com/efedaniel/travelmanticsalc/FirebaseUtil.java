@@ -87,6 +87,8 @@ public class FirebaseUtil {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
+                        .setTheme(R.style.LoginTheme)
+                        .setLogo(R.drawable.travelmantis_logo_white)
                         .build(),
                 FirebaseUISignInKey);
     }

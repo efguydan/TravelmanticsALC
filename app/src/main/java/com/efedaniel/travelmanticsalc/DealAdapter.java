@@ -1,12 +1,10 @@
 package com.efedaniel.travelmanticsalc;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +19,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -38,7 +40,6 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 TravelDeal deal = dataSnapshot.getValue(TravelDeal.class);
-                Log.d("The Title is", deal.getTitle());
                 deal.setId(dataSnapshot.getKey());
                 mDeals.add(deal);
                 notifyDataSetChanged();
@@ -84,17 +85,14 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
 
     public class DealViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView titleTextView;
-        TextView descriptionTextView;
-        TextView priceTextView;
-        ImageView dealImageView;
+        @BindView(R.id.title) TextView titleTextView;
+        @BindView(R.id.description) TextView descriptionTextView;
+        @BindView(R.id.price) TextView priceTextView;
+        @BindView(R.id.deal_image) CircleImageView dealImageView;
 
         public DealViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleTextView = itemView.findViewById(R.id.title);
-            descriptionTextView = itemView.findViewById(R.id.description);
-            priceTextView = itemView.findViewById(R.id.price);
-            dealImageView = itemView.findViewById(R.id.deal_image);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
