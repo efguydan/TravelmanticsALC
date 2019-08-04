@@ -1,5 +1,6 @@
 package com.efedaniel.travelmanticsalc;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,11 +76,18 @@ public class ListActivity extends AppCompatActivity {
         dealsRecyclerView.setAdapter(dealAdapter);
         dealsRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         FirebaseUtil.attachAuthListener();
-        Toast.makeText(getBaseContext(), "Welcome back!", Toast.LENGTH_LONG).show();
     }
 
     public void showMenu() {
         invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == FirebaseUtil.FirebaseUISignInKey && resultCode == RESULT_OK) {
+            Toast.makeText(getBaseContext(), getString(R.string.welcome_back), Toast.LENGTH_LONG).show();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

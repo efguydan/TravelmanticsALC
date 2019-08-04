@@ -14,13 +14,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.cottacush.android.currencyedittext.CurrencyInputWatcher;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +59,7 @@ public class DealActivity extends AppCompatActivity {
     }
 
     private void initializeDeal() {
+        priceEditText.addTextChangedListener(new CurrencyInputWatcher(priceEditText,"₦", Locale.getDefault()));
         titleEditText.setText(mDeal.getTitle());
         priceEditText.setText(mDeal.getPrice());
         descriptionEditText.setText(mDeal.getDescription());
@@ -83,6 +86,7 @@ public class DealActivity extends AppCompatActivity {
         if (requestCode == PICTURE_RESULT && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
             StorageReference ref = FirebaseUtil.mStorageReference.child(imageUri.getLastPathSegment());
+
             ref.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
                 ref.getDownloadUrl().addOnSuccessListener(uri -> {
                     mDeal.setImageUrl(uri.toString());
@@ -99,6 +103,7 @@ public class DealActivity extends AppCompatActivity {
         inflater.inflate(R.menu.save_menu, menu);
         menu.findItem(R.id.delete_menu).setVisible(isAdmin);
         menu.findItem(R.id.save_menu).setVisible(isAdmin);
+        if (mDeal.getId() != null) menu.findItem(R.id.save_menu).setTitle(R.string.update);
         switchEditTexts(isAdmin);
         return true;
     }
@@ -113,7 +118,6 @@ public class DealActivity extends AppCompatActivity {
                 return true;
             case R.id.delete_menu:
                 deleteDeal();
-                Toast.makeText(this, "Deal Deleted", Toast.LENGTH_LONG).show();
                 finish();
                 return true;
             default:
@@ -135,6 +139,9 @@ public class DealActivity extends AppCompatActivity {
         priceEditText.setEnabled(isAdmin);
         descriptionEditText.setEnabled(isAdmin);
         titleEditText.setEnabled(isAdmin);
+        descriptionEditText.setFocusable(isAdmin);
+        priceEditText.setFocusable(isAdmin);
+        titleEditText.setFocusable(isAdmin);
     }
 
     private void saveDeal() {
@@ -159,6 +166,7 @@ public class DealActivity extends AppCompatActivity {
                     .addOnSuccessListener(aVoid -> Log.d("Delete Image", "Image Successfully Deleted"))
                     .addOnFailureListener(e -> Log.d("Delete Image", e.getMessage()));
         }
+        Toast.makeText(this, "Deal Deleted", Toast.LENGTH_LONG).show();
     }
 
     @Override
